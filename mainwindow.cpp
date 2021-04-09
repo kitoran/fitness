@@ -5,6 +5,7 @@
 //you need to call speakInit at start of program and speakCleanup at the end
 //written by: Bill Heaster
 //TheCreator a7 ApexLogic |)0T net
+//#include <condition_variable>
 
 #include <stdio.h>
 #include <QProcess>
@@ -129,35 +130,43 @@ int changeWordSpeed(int newVal)
     return 0;
 }
 
-QQueue<QString> exercises;
+struct exercise_struct {
+    QString name;
+    int runningTime {11};
+    int rest {12};
+    int sets{4};
+};
+QQueue<exercise_struct> exercises;
 QString congrat;
 std::thread work;
+bool canRun = false;
+bool pause2;
 // speechtest.c
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
 
     speakInit();
-    speak("Поздравляю");
 
     ui->setupUi(this);
     work = std::thread([&](){
 //        int exnum = 5;
         while(true) {
-            while(exercises.empty()) {
+            while(!canRun) {
                 std::this_thread::yield();
             }
-            QString exercise = exercises.dequeue();
-            ui->exname->setText(exercise+" ");
-            speak(exercise + "for eleven seconds in 5 seconds");
+            exercise_struct exercise = exercises.dequeue();
+            ui->exname->setText(exercise.name+" ");
+            speak(exercise.name + "for " + QString::number(
+                      exercise.runningTime) + " seconds in 5 seconds");
             std::this_thread::sleep_for (std::chrono::seconds(5));
 
-            for(int exn = 0; exn < 4; exn++) {
-                ui->exname->setText(exercise+" ");
-                speak(excercises[exn/4] + "for eleven seconds");
-                for(int sec = 11; sec > 0; sec--) {
+            for(int exn = 0; exn < exercise.sets; exn++) {
+                ui->exname->setText(exercise.name+" ");
+                speak(exercise.name + "for " + QString::number(
+                          exercise.runningTime) + " seconds");
+                for(int sec = exercise.runningTime; sec > 0; sec--) {
                     while(pause2) {
                         std::this_thread::yield();
                     };
@@ -168,10 +177,11 @@ MainWindow::MainWindow(QWidget *parent) :
                     std::this_thread::sleep_for (std::chrono::seconds(1));
                 }
                 if(exn < 3 || !exercises.empty()) {
-                    if(exn == 3) exercise = exercises.front();
-                    ui->exname->setText(excercise+" ");
-                    speak("rest for nineteen seconds");
-                    for(int sec = 19; sec > 0; sec--) {
+                    if(exn == 3) exercise.name = exercises.front().name;
+                    ui->exname->setText(QString("%1 (%2/%3) ").arg(exercise.name).arg(exn+1).arg(exercise.sets));
+                    speak("rest for " + QString::number(
+                              exercise.rest) + "  seconds");
+                    for(int sec = exercise.rest; sec > 0; sec--) {
                         while(pause2) {
                             std::this_thread::yield();
                         };
@@ -183,7 +193,10 @@ MainWindow::MainWindow(QWidget *parent) :
                     }
                 }
             }
-            if(exercises.empty()) speak(congrat);
+            if(exercises.empty()) {
+                canRun = false;
+                speak(congrat);
+            }
         }
     });
 
@@ -197,20 +210,74 @@ MainWindow::~MainWindow()
     delete ui;
     speakCleanup();
 }
-bool pause2;
 void MainWindow::on_pushButton_clicked()
 {
-    QStringList cexcercises  {
-        "decline pushups",
-        "lateral pushups",
-        "shoulder tap pushups",
-        "pushups",
-        "incline pushups"};
+    QList<exercise_struct> cexcercises  {
+        {"decline pushups", 11, 19},
+        {"lateral pushups", 11, 19},
+        {"shoulder tap pushups", 11, 19},
+        {"pushups", 11, 19},
+        {"incline pushups", 11, 19}};
     exercises.append(cexcercises);
     congrat = "congratulations. You finished your chest workout";
+    canRun = true;
 }
 
 void MainWindow::on_toolButton_clicked(bool checked)
 {
     pause2 = checked;
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    QList<exercise_struct> cexcercises  {
+        {"shrugs", 20, 10},
+        {"dumbbell deadlift", 50, 10},
+        {"bentover row", 50, 10},
+        {"Renegade Row", 50, 10}
+        };
+    exercises.append(cexcercises);
+    congrat = "congratulations. You finished your back workout";
+    canRun = true;
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    QList<exercise_struct> cexcercises  {
+        {"overhead extension", 13, 17},
+        {"overhead extension", 13, 17},
+        {"normal curls", 13, 17},
+        {"hammer curls", 13, 17},
+        };
+    exercises.append(cexcercises);
+    congrat = "congratulations. You finished your arms workout";
+    canRun = true;
+
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    QList<exercise_struct> cexcercises  {
+        {"upper crunches", 25, 5},
+        {"side plank", 30, 5, 2},
+        {"side dips", 30, 5, 2},
+        {"Lying Leg Raises", 30, 5},
+        {"bicycle crunches", 20, 0},
+        };
+    exercises.append(cexcercises);
+    congrat = "congratulations. You finished your ab workout";
+    canRun = true;
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    QList<exercise_struct> cexcercises  {
+        {"weighed deep steps", 11, 19},
+        {"weighed situowns", 11, 19},
+        {"deep steps", 11, 19},
+        {"situowns", 11, 19}
+        };
+    exercises.append(cexcercises);
+    congrat = "congratulations. You finished your legs workout";
+    canRun = true;
 }

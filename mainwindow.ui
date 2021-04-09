@@ -32,16 +32,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="pushButton_4">
         <property name="text">
-         <string>руки</string>
+         <string>кранчи</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_4">
+       <widget class="QPushButton" name="pushButton_3">
         <property name="text">
-         <string>пресс</string>
+         <string>руки</string>
         </property>
        </widget>
       </item>
