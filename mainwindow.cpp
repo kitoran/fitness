@@ -231,10 +231,11 @@ void MainWindow::on_toolButton_clicked(bool checked)
 void MainWindow::on_pushButton_2_clicked()
 {
     QList<exercise_struct> cexcercises  {
+        {"pullups", 40, 20},
         {"shrugs", 20, 10},
-        {"dumbbell deadlift", 50, 10},
         {"bentover row", 50, 10},
-        {"Renegade Row", 50, 10}
+        {"Renegade Row", 50, 10},
+        {"dumbbell deadlift", 50, 10},
         };
     exercises.append(cexcercises);
     congrat = "congratulations. You finished your back workout";
@@ -246,7 +247,7 @@ void MainWindow::on_pushButton_3_clicked()
     QList<exercise_struct> cexcercises  {
         {"overhead extension", 13, 17},
         {"overhead extension", 13, 17},
-        {"normal curls", 13, 17},
+        {"normal curls", 17, 13},
         {"hammer curls", 13, 17},
         };
     exercises.append(cexcercises);
